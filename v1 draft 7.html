@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>VIVACE 2026 - Compact</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+
+        body {
+            background: #e9eef3;
+            font-family: 'Doublebass', 'Balsamiq Sans', 'Kapsalon', 'Glacial Indifference', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 12px;
+        }
+
+        .card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 36px;
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #8B0000, #D32F2F);
+            padding: 16px 16px;
+            color: white;
+            text-align: center;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: 800;
+        }
+
+        .tagline {
+            font-size: 10px;
+            opacity: 0.8;
+            margin-top: 2px;
+        }
+
+        .participant-section {
+            background: white;
+            padding: 10px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .participant-label {
+            font-size: 11px;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .participant-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #nameDisplay {
+            font-weight: 700;
+            background: #f1f5f9;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 14px;
+        }
+
+        .edit-name-btn {
+            background: #eef2ff;
+            border: none;
+            border-radius: 30px;
+            padding: 4px 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .progress-area {
+            padding: 12px 16px 8px;
+        }
+
+        .progress-text {
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .progress-bar-bg {
+            background: #e2e8f0;
+            border-radius: 20px;
+            height: 8px;
+        }
+
+        .progress-fill {
+            background: linear-gradient(90deg, #D32F2F, #8B0000);
+            width: 0%;
+            height: 100%;
+            border-radius: 20px;
+            transition: width 0.3s;
+        }
+
+        .checkpoint-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            padding: 16px;
+        }
+
+        .checkpoint-card {
+            background: #fef9e3;
+            border-radius: 20px;
+            text-align: center;
+            padding: 10px 4px;
+            border: 1px solid #fde68a;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .checkpoint-card.visited {
+            background: #cbd5e1;
+            border-color: #94a3b8;
+            filter: grayscale(0.3);
+            opacity: 0.7;
+            cursor: default;
+        }
+
+        .checkpoint-card:active:not(.visited) {
+            transform: scale(0.97);
+        }
+
+        .checkpoint-icon {
+            font-size: 28px;
+            margin-bottom: 4px;
+        }
+
+        .checkpoint-name {
+            font-weight: 600;
+            font-size: 10px;
+            line-height: 1.2;
+        }
+
+        /* Prize section - compact */
+        .prize-section {
+            padding: 10px 16px 16px;
+            background: #fef9e3;
+            border-top: 1px solid #fde68a;
+        }
+
+        .prize-title {
+            font-weight: 700;
+            text-align: center;
+            font-size: 13px;
+            margin-bottom: 10px;
+            color: #8B0000;
+        }
+
+        .prize-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .prize-circle {
+            background: #ffe6cc;
+            border-radius: 50%;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid #ffb347;
+            cursor: not-allowed;
+            opacity: 0.5;
+            transition: 0.1s;
+            padding: 6px;
+        }
+
+        .prize-circle.available {
+            cursor: pointer;
+            opacity: 1;
+            background: #ffd699;
+            border-color: #ff8c00;
+        }
+
+        .prize-circle.redeemed {
+            cursor: default;
+            opacity: 0.5;
+            background: #b3b3b3;
+            border-color: #666;
+            text-decoration: line-through;
+        }
+
+        .prize-icon {
+            font-size: 22px;
+            margin-bottom: 4px;
+        }
+
+        .prize-label {
+            font-weight: 600;
+            font-size: 11px;
+        }
+
+        .prize-req {
+            font-size: 9px;
+            color: #555;
+        }
+
+        .reset-btn {
+            background: #e2e8f0;
+            color: #1e293b;
+            width: calc(100% - 32px);
+            margin: 6px 16px 16px;
+            border: none;
+            padding: 8px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .footer {
+            font-size: 9px;
+            text-align: center;
+            color: #94a3b8;
+            padding: 10px;
+            background: white;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 40px;
+            max-width: 280px;
+            width: 80%;
+            padding: 20px 16px;
+            text-align: center;
+        }
+
+        .modal-content h3 {
+            margin: 0 0 8px;
+            font-size: 18px;
+        }
+
+        .modal-content p {
+            font-size: 13px;
+            margin: 0 0 8px;
+        }
+
+        .modal-content input {
+            width: 100%;
+            padding: 10px;
+            margin: 8px 0;
+            border: 1px solid #cbd5e1;
+            border-radius: 40px;
+            font-size: 16px;
+            text-align: center;
+        }
+
+        .modal-content button {
+            background: #D32F2F;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            margin: 4px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .modal-error {
+            color: #b91c1c;
+            font-size: 11px;
+            margin-top: 8px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card">
+        <div class="header">
+            <h1>VIVACE 2026</h1>
+            <div class="tagline">tap & stamp · every 3 stamps = prize</div>
+        </div>
+        <div class="participant-section">
+            <span class="participant-label">Cardholder</span>
+            <div class="participant-name">
+                <span id="nameDisplay">Guest</span>
+                <button class="edit-name-btn" id="editNameBtn">✎</button>
+            </div>
+        </div>
+        <div class="progress-area">
+            <div class="progress-text">🏆 Booths visited: <span id="progressCount">0</span> / 9</div>
+            <div class="progress-bar-bg">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+        </div>
+
+        <!-- 9 Booths (compact) -->
+        <div class="checkpoint-grid">
+            <div class="checkpoint-card" data-id="b1" data-name="SMU Badminton" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">🏸</div>
+                <div class="checkpoint-name">SMU Badminton</div>
+            </div>
+            <div class="checkpoint-card" data-id="b2" data-name="SMU Truly Malaysia" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">🇲🇾</div>
+                <div class="checkpoint-name">SMU Truly Malaysia</div>
+            </div>
+            <div class="checkpoint-card" data-id="b3" data-name="SMUX Skating" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">🛼</div>
+                <div class="checkpoint-name">SMUX Skating</div>
+            </div>
+            <div class="checkpoint-card" data-id="b4" data-name="SMUSAIC" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">📷</div>
+                <div class="checkpoint-name">SMUSAIC</div>
+            </div>
+            <div class="checkpoint-card" data-id="b5" data-name="EYE Investment" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">📈</div>
+                <div class="checkpoint-name">EYE Investment</div>
+            </div>
+            <div class="checkpoint-card" data-id="b6" data-name="SMU Civil Defence Lionhearter Chapter"
+                onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">🚑</div>
+                <div class="checkpoint-name">SMU Civil Defence Lionhearter Chapter</div>
+            </div>
+            <div class="checkpoint-card" data-id="b7" data-name="Wine Club" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">🍷</div>
+                <div class="checkpoint-name">Wine Appreciation Club</div>
+            </div>
+            <div class="checkpoint-card" data-id="b8" data-name="tbc" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">❓</div>
+                <div class="checkpoint-name">tbc</div>
+            </div>
+            <div class="checkpoint-card" data-id="b9" data-name="tbc" onclick="handleBoothClick(this)">
+                <div class="checkpoint-icon">❓</div>
+                <div class="checkpoint-name">tbc</div>
+            </div>
+        </div>
+
+        <!-- Prize Redemption (compact) -->
+        <div class="prize-section">
+            <div class="prize-title">🎁 Redeem Prizes 🎁</div>
+            <div class="prize-grid">
+                <div class="prize-circle" data-prize="1" onclick="handlePrizeClick(1)">
+                    <div class="prize-icon">🥉</div>
+                    <div class="prize-label">3 stamps</div>
+                    <div class="prize-req">Prize A</div>
+                </div>
+                <div class="prize-circle" data-prize="2" onclick="handlePrizeClick(2)">
+                    <div class="prize-icon">🥈</div>
+                    <div class="prize-label">6 stamps</div>
+                    <div class="prize-req">Prize B</div>
+                </div>
+                <div class="prize-circle" data-prize="3" onclick="handlePrizeClick(3)">
+                    <div class="prize-icon">🥇</div>
+                    <div class="prize-label">9 stamps</div>
+                    <div class="prize-req">Prize C</div>
+                </div>
+            </div>
+        </div>
+
+        <button class="reset-btn" id="resetProgressBtn">⟳ Reset (admin only)</button>
+        <div class="footer">Tap booth → enter 4‑digit code → earn stamp → unlock prizes!</div>
+    </div>
+
+    <!-- Modal for code -->
+    <div id="codeModal" class="modal">
+        <div class="modal-content">
+            <h3 id="modalCheckpointName">Booth</h3>
+            <p>Enter crew's 4‑digit code:</p>
+            <input type="text" id="codeInput" placeholder="Code" autocomplete="off" inputmode="numeric"
+                pattern="[0-9]*">
+            <div>
+                <button id="modalConfirmBtn">✓ Verify</button>
+                <button id="modalCancelBtn">✗ Cancel</button>
+            </div>
+            <div id="modalError" class="modal-error"></div>
+        </div>
+    </div>
+
+    <script>
+        // ---- HASH FUNCTION ----
+        function simpleHash(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return hash.toString();
+        }
+
+        // ---- 9 BOOTH CODES (hashed) ----
+        const boothCodes = {
+            b1: simpleHash("1121"),
+            b2: simpleHash("1963"),
+            b3: simpleHash("0345"),
+            b4: simpleHash("4000"),
+            b5: simpleHash("8080"),
+            b6: simpleHash("1777"),
+            b7: simpleHash("1945"),
+            b8: simpleHash("0000"),
+            b9: simpleHash("0000")
+        };
+
+        // ---- PRIZE SETUP ----
+        const prizeThresholds = { 1: 3, 2: 6, 3: 9 };
+        const STORAGE_KEY = "vivace_visited";
+        const NAME_KEY = "vivace_name";
+        const REDEEMED_KEY = "vivace_redeemed";
+
+        let visitedSet = new Set();
+        let redeemedPrizes = new Set();
+
+        try {
+            const storedVisited = localStorage.getItem(STORAGE_KEY);
+            if (storedVisited) visitedSet = new Set(JSON.parse(storedVisited));
+            const storedRedeemed = localStorage.getItem(REDEEMED_KEY);
+            if (storedRedeemed) redeemedPrizes = new Set(JSON.parse(storedRedeemed));
+        } catch (e) { }
+
+        // ---- DOM elements ----
+        const progressFill = document.getElementById("progressFill");
+        const progressCountSpan = document.getElementById("progressCount");
+        const nameDisplaySpan = document.getElementById("nameDisplay");
+        const editNameBtn = document.getElementById("editNameBtn");
+        const resetBtn = document.getElementById("resetProgressBtn");
+        const modal = document.getElementById("codeModal");
+        const modalCheckpointName = document.getElementById("modalCheckpointName");
+        const codeInput = document.getElementById("codeInput");
+        const modalConfirmBtn = document.getElementById("modalConfirmBtn");
+        const modalCancelBtn = document.getElementById("modalCancelBtn");
+        const modalError = document.getElementById("modalError");
+        let currentBoothId = null;
+
+        function updateUI() {
+            // Booths visited class
+            document.querySelectorAll(".checkpoint-card").forEach(card => {
+                const id = card.getAttribute("data-id");
+                if (visitedSet.has(id)) card.classList.add("visited");
+                else card.classList.remove("visited");
+            });
+            const total = 9;
+            const visitedCount = visitedSet.size;
+            progressFill.style.width = (visitedCount / total) * 100 + "%";
+            progressCountSpan.innerText = visitedCount;
+
+            // Update prize circles
+            for (let p = 1; p <= 3; p++) {
+                const circle = document.querySelector(`.prize-circle[data-prize="${p}"]`);
+                if (!circle) continue;
+                const threshold = prizeThresholds[p];
+                const isRedeemed = redeemedPrizes.has(p);
+                const isAvailable = (visitedCount >= threshold) && !isRedeemed;
+                circle.classList.remove("available", "redeemed");
+                if (isRedeemed) {
+                    circle.classList.add("redeemed");
+                    circle.style.cursor = "default";
+                } else if (isAvailable) {
+                    circle.classList.add("available");
+                    circle.style.cursor = "pointer";
+                } else {
+                    circle.style.cursor = "not-allowed";
+                }
+            }
+        }
+
+        function saveVisited() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify([...visitedSet]));
+            updateUI();
+        }
+        function saveRedeemed() {
+            localStorage.setItem(REDEEMED_KEY, JSON.stringify([...redeemedPrizes]));
+            updateUI();
+        }
+        function visitBooth(id) {
+            if (visitedSet.has(id)) return;
+            visitedSet.add(id);
+            saveVisited();
+        }
+
+        window.handleBoothClick = function (card) {
+            const id = card.getAttribute("data-id");
+            if (visitedSet.has(id)) return;
+            const name = card.getAttribute("data-name");
+            currentBoothId = id;
+            modalCheckpointName.innerText = name;
+            codeInput.value = "";
+            modalError.innerText = "";
+            modal.style.display = "flex";
+            setTimeout(() => codeInput.focus(), 100);
+        };
+
+        function closeModal() {
+            modal.style.display = "none";
+            currentBoothId = null;
+        }
+
+        function verifyCode() {
+            if (!currentBoothId) return;
+            const entered = codeInput.value.trim();
+            if (simpleHash(entered) === boothCodes[currentBoothId]) {
+                visitBooth(currentBoothId);
+                closeModal();
+            } else {
+                modalError.innerText = "❌ Incorrect code";
+                codeInput.value = "";
+                codeInput.focus();
+            }
+        }
+
+        window.handlePrizeClick = function (prizeNum) {
+            const visited = visitedSet.size;
+            const needed = prizeThresholds[prizeNum];
+            if (redeemedPrizes.has(prizeNum)) {
+                alert("Prize already redeemed!");
+                return;
+            }
+            if (visited >= needed) {
+                if (confirm(`Redeem Prize ${prizeNum}?`)) {
+                    redeemedPrizes.add(prizeNum);
+                    saveRedeemed();
+                    alert("Prize redeemed! Visit prize counter.");
+                }
+            } else {
+                alert(`Need ${needed} stamps (you have ${visited}).`);
+            }
+        };
+
+        function loadName() {
+            const saved = localStorage.getItem(NAME_KEY);
+            nameDisplaySpan.innerText = saved ? saved : "Guest";
+        }
+        function editName() {
+            const newName = prompt("Enter your name:", nameDisplaySpan.innerText);
+            if (newName?.trim()) {
+                localStorage.setItem(NAME_KEY, newName.trim());
+                nameDisplaySpan.innerText = newName.trim();
+            }
+        }
+        function resetAll() {
+            if (confirm("Reset ALL booths and prizes?")) {
+                visitedSet.clear();
+                redeemedPrizes.clear();
+                saveVisited();
+                saveRedeemed();
+            }
+        }
+
+        editNameBtn.addEventListener("click", editName);
+        resetBtn.addEventListener("click", resetAll);
+        modalConfirmBtn.addEventListener("click", verifyCode);
+        modalCancelBtn.addEventListener("click", closeModal);
+        modal.addEventListener("click", (e) => { if (e.target === modal) closeModal(); });
+        codeInput.addEventListener("keypress", (e) => { if (e.key === "Enter") verifyCode(); });
+
+        loadName();
+        updateUI();
+    </script>
+</body>
+
+</html>
